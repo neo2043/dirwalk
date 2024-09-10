@@ -10,6 +10,7 @@
 #include "arraylist.h"
 #include "cwalk.h"
 #include "dirwalk.h"
+#include "common.h"
 
 char *walk_get_absolute_path(walk_ctx *pathCtx, int index, int only_relative_path) {
     char *path = calloc(4, sizeof(char));
@@ -80,9 +81,9 @@ walk_ctx init_walk_ctx(char *root_path) {
     first_seg->associated_no = 0;
     first_seg->passed_over = false;
 #if defined(_WIN32)
-    _stat64(first_seg->segment_name, ctx.stbuf);
+    CHECK(_stat64(first_seg->segment_name, ctx.stbuf)!=-1,"make folder first");
 #elif defined(__unix__) || defined(__linux__)
-    stat(first_seg->segment_name, ctx.stbuf);
+    CHECK(stat(first_seg->segment_name, ctx.stbuf)!=-1,"make folder first");
 #endif
     if (S_ISDIR(ctx.stbuf->st_mode)) {
         first_seg->seg_type = folder;
