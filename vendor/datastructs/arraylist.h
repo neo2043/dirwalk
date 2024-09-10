@@ -20,7 +20,7 @@ unsigned int arraylist_size(arraylist *l);
 void arraylist_allocate(arraylist *l,unsigned int size);
 arraylist *arraylist_create();
 #define arraylist_iterate(l) \
-	for (struct {unsigned int index; void *item;} ctx = {0,l->body[0]}; ctx.index < l->size; ctx.item = l->body[++ctx.index])
+	for (struct {unsigned int index; void *item;} ctx = {0,l->body[0]}; ctx.index < l->size && (ctx.item = l->body[ctx.index]); ctx.index++)
 struct arraylist {
 	unsigned int size; // Count of items currently in list
 	unsigned int capacity; // Allocated memory size, in items

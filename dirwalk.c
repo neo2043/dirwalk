@@ -118,6 +118,7 @@ static struct dirent *readdir_handler(DIR *dir) {
 
 int walk_next(walk_ctx *ctx) {
     segment_t *lst_seg = arraylist_get(ctx->path_segment_stack, arraylist_size(ctx->path_segment_stack) - 1);
+    int freed = 0;
     if (lst_seg->seg_type == folder) {
         DIR *dir;
         if (lst_seg->passed_over) {
@@ -128,13 +129,16 @@ int walk_next(walk_ctx *ctx) {
             seekdir(dir, lst_seg->associated_no);
             segment_t *temp = arraylist_pop(ctx->path_segment_stack);
             deinit_walk_segment(temp);
+            freed = 1;
         } else {
             char *abs_path = walk_get_absolute_path(ctx, -1, 0);
             dir = opendir(abs_path);
             free(abs_path);
         }
         struct dirent *de;
-        lst_seg->passed_over = true;
+        if(!freed){
+            lst_seg->passed_over = true;
+        }
         if ((de = readdir_handler(dir)) == NULL) {
             closedir(dir);
             return walk_next(ctx);
